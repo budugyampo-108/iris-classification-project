@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IrisAI — Flower Species Classifier</title>
+  <meta name="description" content="Random Forest classifier for the Iris dataset with live predictions and a model-evaluation dashboard." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="#predict" aria-label="IrisAI home">
+        <span class="brand-mark">
+          <svg viewBox="0 0 32 32" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="16" cy="16" r="3.2" fill="currentColor" stroke="none"/>
+            <path d="M16 4c3 3 3 7 0 9-3-2-3-6 0-9Z"/><path d="M16 28c-3-3-3-7 0-9 3 2 3 6 0 9Z"/>
+            <path d="M4 16c3-3 7-3 9 0-2 3-6 3-9 0Z"/><path d="M28 16c-3 3-7 3-9 0 2-3 6-3 9 0Z"/>
+          </svg>
+        </span>
+        <span class="brand-name">Iris<span>AI</span></span>
+      </a>
+
+      <nav class="tabs" role="tablist" aria-label="Sections">
+        <button class="tab active" role="tab" data-view="predict" aria-selected="true">Predict</button>
+        <button class="tab" role="tab" data-view="dashboard" aria-selected="false">Dashboard</button>
+        <button class="tab" role="tab" data-view="about" aria-selected="false">About</button>
+      </nav>
+
+      <div class="topbar-right">
+        <span class="status" id="apiStatus" title="API status"><i></i><b>Connecting</b></span>
+        <button class="icon-btn" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <span class="eyebrow">Machine Learning · Random Forest · Iris Dataset</span>
+      <h1>Identify an iris flower<br /><span class="grad">from four measurements.</span></h1>
+      <p class="lead">Enter sepal and petal dimensions to get an instant species prediction with class probabilities, or explore the full evaluation dashboard of the trained model.</p>
+    </section>
+
+    <!-- ============== PREDICT ============== -->
+    <section id="view-predict" class="view active">
+      <div class="grid-2">
+        <form id="predictForm" class="card" novalidate>
+          <div class="card-head">
+            <div>
+              <h2>Flower measurements</h2>
+              <p class="muted">All values are in centimetres.</p>
+            </div>
+          </div>
+
+          <div class="presets">
+            <span class="muted small">Try a sample:</span>
+            <button type="button" class="chip" data-preset="setosa"><i class="dot setosa"></i>Setosa</button>
+            <button type="button" class="chip" data-preset="versicolor"><i class="dot versicolor"></i>Versicolor</button>
+            <button type="button" class="chip" data-preset="virginica"><i class="dot virginica"></i>Virginica</button>
+          </div>
+
+          <div class="fields" id="fields"></div>
+
+          <div class="actions">
+            <button type="submit" class="btn primary" id="predictBtn">
+              <span class="btn-label">Predict species</span>
+              <span class="spinner" hidden></span>
+            </button>
+            <button type="button" class="btn ghost" id="resetBtn">Reset</button>
+          </div>
+          <p class="error" id="formError" role="alert" hidden></p>
+        </form>
+
+        <div class="card result-card" id="resultCard" aria-live="polite">
+          <div class="result-empty" id="resultEmpty">
+            <div class="flower-art">
+              <svg viewBox="0 0 120 120" width="120" height="120" fill="none">
+                <g opacity=".95">
+                  <ellipse cx="60" cy="32" rx="13" ry="26" fill="url(#g1)"/>
+                  <ellipse cx="60" cy="88" rx="13" ry="26" fill="url(#g1)"/>
+                  <ellipse cx="32" cy="60" rx="26" ry="13" fill="url(#g2)"/>
+                  <ellipse cx="88" cy="60" rx="26" ry="13" fill="url(#g2)"/>
+                  <circle cx="60" cy="60" r="9" fill="#fbbf24"/>
+                </g>
+                <defs>
+                  <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#818cf8"/><stop offset="1" stop-color="#c084fc"/></linearGradient>
+                  <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c084fc"/><stop offset="1" stop-color="#f472b6"/></linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <h3>Your prediction appears here</h3>
+            <p class="muted">Adjust the sliders and press <b>Predict species</b>.</p>
+          </div>
+
+          <div class="result-body" id="resultBody" hidden>
+            <span class="eyebrow">Predicted species</span>
+            <div class="species-row">
+              <div>
+                <h2 class="species-name" id="speciesName">—</h2>
+                <p class="species-latin" id="speciesLatin"></p>
+              </div>
+              <div class="ring" id="ring" style="--p:0">
+                <div class="ring-inner"><b id="ringValue">0%</b><small>confidence</small></div>
+              </div>
+            </div>
+            <p class="species-desc" id="speciesDesc"></p>
+            <h4>Class probabilities</h4>
+            <div class="probs" id="probs"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== DASHBOARD ============== -->
+    <section id="view-dashboard" class="view">
+      <div class="section-head">
+        <div>
+          <h2>Model evaluation dashboard</h2>
+          <p class="muted" id="modelMeta">Loading model details…</p>
+        </div>
+        <button class="btn ghost small" id="refreshMetrics">Refresh</button>
+      </div>
+
+      <div class="kpis" id="kpis"></div>
+
+      <div class="grid-2 mt">
+        <div class="card">
+          <div class="card-head"><div><h3>Score overview</h3><p class="muted">All metrics on the held-out test set</p></div></div>
+          <div id="barChart" class="bar-chart"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Confusion matrix</h3><p class="muted">Rows = actual · Columns = predicted</p></div></div>
+          <div id="confusion" class="confusion"></div>
+        </div>
+      </div>
+
+      <div class="grid-2 mt">
+        <div class="card">
+          <div class="card-head"><div><h3>Per-class performance</h3><p class="muted">Precision, recall and F1 for each species</p></div></div>
+          <div class="table-wrap"><table class="table" id="perClass"></table></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Feature importance</h3><p class="muted">Which measurements drive the predictions</p></div></div>
+          <div id="importance" class="importance"></div>
+        </div>
+      </div>
+
+      <div class="card mt">
+        <div class="card-head"><div><h3>Dataset overview</h3><p class="muted" id="datasetMeta"></p></div></div>
+        <div class="grid-2 inner">
+          <div id="classDist" class="importance"></div>
+          <div class="table-wrap"><table class="table" id="featureStats"></table></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== ABOUT ============== -->
+    <section id="view-about" class="view">
+      <div class="card about">
+        <h2>About this project</h2>
+        <p>This application is an end-to-end machine-learning system built for a university assignment. It trains a <b>Random Forest</b> classifier on scikit-learn's Iris dataset (150 samples, 3 species, 4 numeric features) and exposes it through a REST API.</p>
+        <div class="about-grid">
+          <div><h4>Model</h4><p class="muted">Random Forest, 200 trees, stratified 80/20 split.</p></div>
+          <div><h4>Backend</h4><p class="muted">FastAPI with <code>/api/metrics</code> and <code>/api/predict</code>.</p></div>
+          <div><h4>Web</h4><p class="muted">This responsive interface, served as static files on Vercel.</p></div>
+          <div><h4>Mobile</h4><p class="muted">React Native / Expo app using the same live API.</p></div>
+        </div>
+        <div class="links">
+          <a class="btn ghost small" id="githubLink" href="https://github.com/YOUR_USERNAME/YOUR_REPO" target="_blank" rel="noopener">GitHub repository ↗</a>
+          <a class="btn ghost small" href="/docs" target="_blank" rel="noopener">API docs ↗</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <span>IrisAI · Machine Learning Assignment 1</span>
+      <span class="muted">Built with scikit-learn, FastAPI &amp; Expo</span>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

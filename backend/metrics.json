@@ -1,0 +1,114 @@
+{
+  "model": "RandomForestClassifier",
+  "hyperparameters": {
+    "n_estimators": 200,
+    "max_depth": null,
+    "random_state": 42
+  },
+  "split": {
+    "train_size": 120,
+    "test_size": 30,
+    "test_fraction": 0.2,
+    "stratified": true
+  },
+  "accuracy": 0.9,
+  "precision": 0.9023569023569024,
+  "macro_precision": 0.9023569023569024,
+  "macro_recall": 0.9,
+  "macro_f1": 0.899749373433584,
+  "roc_auc_ovr": 0.9866666666666667,
+  "confusion_matrix": [
+    [
+      10,
+      0,
+      0
+    ],
+    [
+      0,
+      9,
+      1
+    ],
+    [
+      0,
+      2,
+      8
+    ]
+  ],
+  "class_names": [
+    "setosa",
+    "versicolor",
+    "virginica"
+  ],
+  "per_class": {
+    "setosa": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 10
+    },
+    "versicolor": {
+      "precision": 0.8181818181818182,
+      "recall": 0.9,
+      "f1": 0.8571428571428571,
+      "support": 10
+    },
+    "virginica": {
+      "precision": 0.8888888888888888,
+      "recall": 0.8,
+      "f1": 0.8421052631578947,
+      "support": 10
+    }
+  },
+  "cross_validation": {
+    "folds": 5,
+    "mean_accuracy": 0.9666666666666668,
+    "std_accuracy": 0.02108185106778919
+  },
+  "feature_importance": {
+    "sepal_length": 0.11587288933919555,
+    "sepal_width": 0.017885213270972027,
+    "petal_length": 0.45379307854941836,
+    "petal_width": 0.4124488188404141
+  },
+  "dataset": {
+    "samples": 150,
+    "features": [
+      "sepal_length",
+      "sepal_width",
+      "petal_length",
+      "petal_width"
+    ],
+    "classes": [
+      "setosa",
+      "versicolor",
+      "virginica"
+    ],
+    "class_counts": {
+      "setosa": 50,
+      "versicolor": 50,
+      "virginica": 50
+    },
+    "feature_ranges": {
+      "sepal_length": {
+        "min": 4.3,
+        "max": 7.9,
+        "mean": 5.843333333333334
+      },
+      "sepal_width": {
+        "min": 2.0,
+        "max": 4.4,
+        "mean": 3.0573333333333337
+      },
+      "petal_length": {
+        "min": 1.0,
+        "max": 6.9,
+        "mean": 3.7580000000000005
+      },
+      "petal_width": {
+        "min": 0.1,
+        "max": 2.5,
+        "mean": 1.1993333333333336
+      }
+    }
+  }
+}

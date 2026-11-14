@@ -1,0 +1,6 @@
+mobile/
+report/
+node_modules/
+__pycache__/
+*.pyc
+.venv/
