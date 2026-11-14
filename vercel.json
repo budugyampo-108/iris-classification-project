@@ -1,18 +1,27 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python",
-      "config": { "maxLambdaSize": "250mb", "includeFiles": "backend/**" }
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "app": {
+      "root": ".",
+      "framework": "fastapi"
     },
-    { "src": "web/**", "use": "@vercel/static" }
-  ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "api/index.py" },
-    { "src": "/docs", "dest": "api/index.py" },
-    { "src": "/openapi.json", "dest": "api/index.py" },
-    { "src": "/", "dest": "web/index.html" },
-    { "src": "/(.+)", "dest": "web/$1" }
+    "backend": {
+      "root": "backend",
+      "framework": "fastapi"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "backend"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "app"
+      }
+    }
   ]
 }
